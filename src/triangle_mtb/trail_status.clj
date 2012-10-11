@@ -1,4 +1,4 @@
-(ns triangle-mtb.core
+(ns triangle-mtb.trail-status
   (:require [net.cgrand.enlive-html :as h])
   (:require [clojure.string :as s])
   (:import java.net.URL))
@@ -6,9 +6,9 @@
 (defn fetch-raw-trail-status []
   (-> "http://www.trianglemtb.com/trailstatus.php"
       URL.
-      html/html-resource))
+      h/html-resource))
 
-(defn raw-status->header [trail-status]
+(defn status->header [trail-status]
   (->>
    (-> trail-status
        (h/select [:tr])
@@ -16,7 +16,7 @@
        (h/select [:td :b]))
    (map (comp first :content))))
 
-(defn raw-status->rows [trail-status]
+(defn status->rows [trail-status]
   (-> trail-status
       (h/select [:tr])
       rest))
@@ -50,10 +50,10 @@
 (defn row->triplet [row]
   ((juxt row->name row->status row->updated-at) row))
 
-(defn fetch-current-trail-status []
+(defn fetch-current []
   (let [status (fetch-raw-trail-status)
-        header (conj (raw-status->header status) "Name")
-        rows   (raw-status->rows status)]
+        header (conj (status->header status) "Name")
+        rows   (status->rows status)]
       (map #(zipmap header (row->triplet %)) rows)))
 
 
