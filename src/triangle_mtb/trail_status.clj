@@ -3,18 +3,11 @@
   (:require [clojure.string :as s])
   (:import java.net.URL))
 
-(defn fetch-raw-trail-status []
-  (-> "http://www.trianglemtb.com/trailstatus.php"
-      URL.
-      h/html-resource))
-
-(defn status->header [trail-status]
-  (->>
-   (-> trail-status
-       (h/select [:tr])
-       first
-       (h/select [:td :b]))
-   (map (comp first :content))))
+(defn keywordize [str]
+  (-> str
+      s/lower-case
+      (s/replace " " "-")
+      keyword))
 
 (defn status->rows [trail-status]
   (-> trail-status
@@ -39,7 +32,7 @@
       s/lower-case
       keyword))
 
-(defn row->updated-at [row]
+(defn row->last-updated [row]
   (-> row
       (h/select [[:td (h/attr? :nowrap)]])
       (h/select [:span])
@@ -48,13 +41,16 @@
       first))
 
 (defn row->triplet [row]
-  ((juxt row->name row->status row->updated-at) row))
+  ((juxt row->name row->status row->last-updated) row))
 
-(defn fetch-current []
-  (let [status (fetch-raw-trail-status)
-        header (conj (status->header status) "Name")
-        rows   (status->rows status)]
-      (map #(zipmap header (row->triplet %)) rows)))
+(defn fetch []
+  (-> "http://www.trianglemtb.com/trailstatus.php"
+      URL.
+      h/html-resource))
 
+(defn parse [html]
+  (let [rows (status->rows html)]
+    (map row->triplet rows)))
 
+(defn current-status [] (parse (fetch)))
 
