@@ -5,6 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [enlive "1.0.0"]
-                 [com.datomic/datomic-free "0.8.3551"]
-                 [clj-time "0.4.4"]]
+                 [com.datomic/datomic-free "0.8.3551"]]
   :main triangle-mtb.command-line)
