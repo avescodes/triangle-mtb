@@ -1,6 +1,7 @@
 (ns triangle-mtb.datomic
   (:use [datomic.api :only [q db] :as d])
-  (:use [clj-time.format :as f]))
+  (:use [clj-time.format :as f])
+  (:require [clj-time.core]))
 
 (def uri "datomic:mem://triangle-mtb")
 
@@ -8,8 +9,7 @@
 
 (def conn (d/connect uri))
 
-;; Trails
-(def schema-tx [
+(def trails-schema-tx [
  ;; Trail Name
  {:db/id #db/id [:db.part/db]
   :db/ident :trail/name
@@ -35,18 +35,20 @@
 
 @(d/transact conn schema-tx)
 
-(def ^:private mtb-time (f/formatters "MM/dd h:m a"))
+(def triangle-mtb-time-format (java.text.SimpleDateFormat. "yy/MM/dd hh:mm a"))
+(defn current-year [] (.. java.util.Calendar (getInstance) (get java.util.Calendar/YEAR)))
+(defn time-string->inst [time-string]
+  (let [string-with-year (str (current-year) "/" time-string)]
+    (.parse triangle-mtb-time-format string-with-year)))
 
-(defn- trail-status->entity-tx [name open last-updated]
+
+(defn trail-status->entity-tx [[name open last-updated]]
   {
    :db/id (d/tempid :db.part/user)
    :trail/name name
    :trail/open? (= :open open)
-   :trail/last-updated (... last-updated)
-   }
-)
+   :trail/last-updated (time-string->inst last-updated)
+   })
 
 (defn update-trail-status [trail-statuses]
   @(d/transact conn (map trail-status->entity-tx trail-statuses)))
-
-
