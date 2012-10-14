@@ -10,6 +10,7 @@
                  [ring/ring-jetty-adapter "1.1.6"]
                  [cheshire "4.0.3"]]
   :main triangle-mtb.command-line
+  :min-lein-version "2.0.0"
   :plugins [[lein-ring "0.7.3"]]
   :ring {:handler triangle-mtb.api}
   :profiles
