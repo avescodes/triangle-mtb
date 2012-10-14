@@ -3,14 +3,8 @@
   (:require [clojure.string :as s])
   (:import java.net.URL))
 
-(defn keywordize [str]
-  (-> str
-      s/lower-case
-      (s/replace " " "-")
-      keyword))
-
-(defn status->rows [trail-status]
-  (-> trail-status
+(defn html->rows [html]
+  (-> html
       (h/select [:tr])
       rest))
 
@@ -23,8 +17,7 @@
 
 (defn row->status [row]
   (-> row
-      (h/select [[:td (h/attr? :title)]])
-      (h/select [:span])
+      (h/select [[:td (h/attr? :title)] [:span]])
       first
       :content
       first
@@ -34,8 +27,7 @@
 
 (defn row->last-updated [row]
   (-> row
-      (h/select [[:td (h/attr? :nowrap)]])
-      (h/select [:span])
+      (h/select [[:td (h/attr? :nowrap)] [:span]])
       first
       :content
       first))
@@ -49,7 +41,7 @@
       h/html-resource))
 
 (defn parse [html]
-  (let [rows (status->rows html)]
+  (let [rows (html->rows html)]
     (map row->triplet rows)))
 
 (defn current-status [] (parse (fetch)))
