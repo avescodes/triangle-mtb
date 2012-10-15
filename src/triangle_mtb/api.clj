@@ -9,9 +9,9 @@
    :body (json/generate-string data)})
 
 (defroutes application
-  (GET "/trail-status.json" [] (json-response {:trail/name "Lake Crabtree"
+  (GET "/trail-status.json" [] (json-response [{:trail/name "Lake Crabtree"
                                                :trail/open? true
-                                               :trail/last-updated (java.util.Date. 0)})))
+                                               :trail/last-updated (java.util.Date. 0)}])))
 
 (defn start [port]
   (ring/run-jetty #'application {:port (or port 8080) :join? false}))
