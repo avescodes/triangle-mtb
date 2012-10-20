@@ -1,7 +1,8 @@
 (ns triangle-mtb.api
   (:use [compojure.core :only [defroutes GET]])
   (:require [ring.adapter.jetty :as ring]
-            [cheshire.core :as json]))
+            [cheshire.core :as json]
+            [triangle-mtb.datomic :as trails]))
 
 (defn json-response [data & [status]]
   {:status (or status 200)
@@ -9,9 +10,7 @@
    :body (json/generate-string data)})
 
 (defroutes application
-  (GET "/trail-status.json" [] (json-response [{:trail/name "Lake Crabtree"
-                                               :trail/open? true
-                                               :trail/last-updated (java.util.Date. 0)}])))
+  (GET "/all.json" [] (json-response (trails/all))))
 
 (defn start [port]
   (ring/run-jetty #'application {:port (or port 8080) :join? false}))
