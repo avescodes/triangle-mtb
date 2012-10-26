@@ -5,8 +5,8 @@
 
 (def uri (or (System/getenv "DATOMIC_URL") "datomic:mem://triangle-mtb"))
 (d/create-database uri)
-(def conn (d/connect uri))
-(tools.schema/load-schema conn)
+(defn conn []  (d/connect uri))
+(tools.schema/load-schema (conn))
 
 (defn trail-status->entity-tx [[name open last-updated]]
   {
@@ -17,7 +17,7 @@
    })
 
 (defn update-trail-status [trail-statuses]
-  @(d/transact conn (map trail-status->entity-tx trail-statuses)))
+  @(d/transact (conn) (map trail-status->entity-tx trail-statuses)))
 
 (defn- qes-and-touch
   "Returns the entities returned by a query, assuming that
@@ -29,6 +29,6 @@
        flatten
        (mapv d/touch)))
 
-(defn all [] (qes-and-touch '[:find ?e :where [?e :trail/name _]] (db conn)))
-(defn open [] (qes-and-touch '[:find ?e :where [?e :trail/open? true]] (db conn)))
-(defn closed [] (qes-and-touch '[:find ?e :where [?e :trail/open? false]] (db conn)))
+(defn all [] (qes-and-touch '[:find ?e :where [?e :trail/name _]] (db (conn))))
+(defn open [] (qes-and-touch '[:find ?e :where [?e :trail/open? true]] (db (conn))))
+(defn closed [] (qes-and-touch '[:find ?e :where [?e :trail/open? false]] (db (conn))))
