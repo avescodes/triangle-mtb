@@ -5,8 +5,12 @@
             [tools.connection-logging]))
 
 (def uri (or (System/getenv "DATOMIC_URL") "datomic:mem://triangle-mtb"))
-(d/create-database uri)
-(defn conn [] (tools.connection-logging/log-ip-addresses) (d/connect uri))
+
+(defn conn []
+  (tools.connection-logging/log-ip-addresses)
+  (d/create-database uri)
+  (d/connect uri))
+
 (tools.schema/load-schema (conn))
 
 (defn trail-status->entity-tx [[name open last-updated]]
