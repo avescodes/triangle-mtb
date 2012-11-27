@@ -1,13 +1,11 @@
 (ns triangle-mtb.datomic
   (:use [datomic.api :only [q db] :as d])
   (:require [tools.schema]
-            [tools.time]
-            [tools.connection-logging]))
+            [tools.time]))
 
 (def uri (or (System/getenv "DATOMIC_URL") "datomic:mem://triangle-mtb"))
 
 (defn conn []
-  (tools.connection-logging/log-ip-addresses)
   (d/create-database uri)
   (d/connect uri))
 
