@@ -8,4 +8,5 @@
   [& args]
   (println "Updating trail statuses...")
   (trails/update-trail-status (mtb/current-status))
-  (println "Updated trail statuses."))
+  (println "Updated trail statuses.")
+  (System/exit 0))
